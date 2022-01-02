@@ -1,0 +1,134 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "User API Documentation",
+        "description": "User API Documentation"
+    },
+    "servers": [
+        {
+            "url": "http://172.31.56.89:3000",
+            "description": "URL DEV"
+        }
+    ],
+    "components": {
+        "securitySchemes": {
+            "accessToken": {
+              "type": "apiKey",
+              "in": "header",
+              "name": "x-auth-token"
+            }
+        },
+        "schemas": {
+            "User": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "name of the user",
+                        "example": "Patria"
+                    },
+                    "username": {
+                        "type": "string",
+                        "description": "username of the user",
+                        "example": "patriagani"
+                    },
+                    "password": {
+                        "type": "string",
+                        "description": "password of the user",
+                        "example": "patria123"
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": ["admin", "user"],
+                        "description": "role of the user",
+                        "example": "user"
+                    }
+                },
+                "required": [
+                    "name",
+                    "username",
+                    "password",
+                    "role"
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "User",
+            "description": "User"
+        }
+    ],
+    "paths": {
+        "/users": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Returns a list of users",
+                "description": "Get list all of users",
+                "security": [
+                    {
+                        "accessToken": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A JSON array of user object"
+                    },
+                    "400": {
+                        "description": "Invalid token"
+                    },
+                    "401": {
+                        "description": "No token provided / expired token"
+                    },
+                    "403": {
+                        "description": "Forbidden (not admin)"
+                    },
+                    "500": {
+                        "description": "Internal server error" 
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create new user",
+                "description": "Create new user object",
+                "security": [
+                    {
+                        "accessToken": []
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "A JSON array of user object"
+                    },
+                    "400": {
+                        "description": "Invalid token"
+                    },
+                    "401": {
+                        "description": "No token provided / expired token"
+                    },
+                    "403": {
+                        "description": "Forbidden (not admin)"
+                    },
+                    "500": {
+                        "description": "Internal server error" 
+                    }
+                }
+            }
+        }
+    }
+}
