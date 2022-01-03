@@ -15,7 +15,7 @@ function auth(req, res, next) {
         next()
     }
     catch (error) {
-        if (error.message == "jwt expired") {
+        if (error.name == "TokenExpiredError") {
             res.status(401).json({
                 message: "Access denied. Expired Token",
             })

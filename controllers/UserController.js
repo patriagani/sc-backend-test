@@ -64,7 +64,7 @@ class UserController {
 
         User.findByIdAndUpdate(req.params.userId, req.body, {new: true})
             .then(function(user) {
-                res.status(200).json({message: "success", data: user})
+                res.status(202).json({message: "success", data: user})
             })
             .catch(function(error){
                 res.status(500).json({
@@ -78,7 +78,7 @@ class UserController {
 
         User.findByIdAndRemove(req.params.userId)
             .then(function(user) {
-                res.status(200).json({message: "success", data: user})
+                res.status(202).json({message: "success", data: user})
             })
             .catch(function(error){
                 res.status(500).json({
@@ -153,18 +153,45 @@ class UserController {
         let decodedRefresh = {}
 
         try {
-            decoded = jwt.verify(req.body.token, process.env.JWT_SECRET)
-            decodedRefresh = jwt.verify(req.body.refreshtoken, process.env.JWT_SECRET_REFRESH)
+            decoded = jwt.verify(req.body.token, process.env.JWT_SECRET, {ignoreExpiration: true})
+            decodedRefresh = jwt.verify(req.body.refreshToken, process.env.JWT_SECRET_REFRESH)
         }
         catch (error) {
-            res.status(400).json({
-                message: "Invalid token",
-                error: error.message
-            })
+            if(error.name == "TokenExpiredError") {
+                res.status(401).json({
+                    message: "Expired refresh token",
+                    error: error.message
+                })
+            }
+            else {
+                res.status(400).json({
+                    message: "Invalid refresh token",
+                    error: error.message
+                })
+            }
         }
 
-        let token = jwt.sign(decoded, process.env.JWT_SECRET, {expiresIn: "5m"})
-        let refreshtoken = jwt.sign(decodedRefresh, process.env.JWT_SECRET_REFRESH, {expiresIn: "1y"})
+        console.log(decoded)
+        console.log(decodedRefresh)
+
+        let newTokenPayload = {
+            _id: decoded._id,
+            name: decoded.name,
+            username: decoded.username,
+            role: decoded.role,
+            tokenType: 'accessToken',
+        }
+
+        let newRefreshTokenPayload = {
+            _id: decodedRefresh._id,
+            name: decodedRefresh.name,
+            username: decodedRefresh.username,
+            role: decodedRefresh.role,
+            tokenType: 'refreshToken',
+        }
+
+        let token = jwt.sign(newTokenPayload, process.env.JWT_SECRET, {expiresIn: "5m"})
+        let refreshtoken = jwt.sign(newRefreshTokenPayload, process.env.JWT_SECRET_REFRESH, {expiresIn: "1y"})
 
         res.header('x-auth-token', token).status(200).json({
             message: "success",
