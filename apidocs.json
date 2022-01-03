@@ -7,6 +7,10 @@
     },
     "servers": [
         {
+            "url": "https://userapi.patriagani.my.id",
+            "description": "URL TEST"
+        },
+        {
             "url": "http://localhost:3000",
             "description": "URL DEV"
         }
